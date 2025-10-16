@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/images/favicon-32x32.png" type="images/png" sizes="favicon-32x32">
+  <title>Frontend Mentor | Product list with cart</title>
+</head>
+<body>
+  
+  <main class="main__container">
+   
+   <div class="sub__container">
+     <h1 class="title">Desserts</h1>
+      <section class="desserts__section"></section>
+   </div>
+    
+    <section class="your__cart">
+      <h2 class="cart__label">Your Cart(0)</h2>
+
+      <!-- Empty Cart -->
+      <img src="assets/images/illustration-empty-cart.svg" alt=" A Cake" class="empty__cart-img">
+      <p class="empty__cart-prompt">Your added items will appear here</p>
+
+      <!-- Non-Empty Cart -->
+       <div class="order__details">
+          <div class="checkout__details">
+            <p class="product__ordered">Classic Tiramisu</p>
+            <span class="quantity">1x</span>
+            <span class="actual__price">@ $5.50</span>
+            <span class="total__amount">$5.50</span>
+          </div>
+          <button class="cancel__btn" data-action="remove">
+            <img src="assets/images/icon-remove-item.svg" alt="remove order" class="cancel__icon">
+          </button>
+       </div>
+       <hr>
+       <div class="order__details">
+          <div class="checkout__details">
+            <p class="product__ordered">Classic Tiramisu</p>
+            <span class="quantity">1x</span>
+            <span class="actual__price">@ $5.50</span>
+            <span class="total__amount">$5.50</span>
+          </div>
+          <button class="cancel__btn" data-action="remove">
+            <img src="assets/images/icon-remove-item.svg" alt="remove order" class="cancel__icon">
+          </button>
+       </div>
+       <hr>
+       <div class="order__details">
+          <div class="checkout__details">
+            <p class="product__ordered">Classic Tiramisu</p>
+            <span class="quantity">1x</span>
+            <span class="actual__price">@ $5.50</span>
+            <span class="total__amount">$5.50</span>
+          </div>
+          <button class="cancel__btn" data-action="remove">
+            <img src="assets/images/icon-remove-item.svg" alt="remove order" class="cancel__icon">
+          </button>
+       </div>
+       <hr>
+
+       <div class="order__total">
+         <p class="order__total-label">Order Total</p>
+         <h3 class="final__amount">$46.50</h3>
+       </div>
+
+       <div class="remark">
+          <img src="assets/images/icon-carbon-neutral.svg" alt="tree icon" class="tree">
+          <p class="message">
+            This is a <span class="carbon">carbon-neutral</span> delivery
+          </p>
+       </div>
+
+       <button class="confirm__btn" data-action="confirm">Confirm Order</button>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
