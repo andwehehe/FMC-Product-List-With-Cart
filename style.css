@@ -93,23 +93,64 @@ body {
 .addToCart {
   width: 10rem;
   border-radius: 2rem;
-  border: solid 0.1rem var(--Rose-400);
+  border: solid 0.12rem var(--Rose-400);
   font-weight: var(--Weight-600);
-  background-color: var(--Rose-50);
   font-size: 0.97rem;
+  background-color: var(--Rose-50);
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   gap: 0.4rem;
   padding: 0.65rem;
   position: relative;
   bottom: 1.5rem;
 }
 
+.addToCart:hover {
+  border: solid var(--Red) 0.12rem;
+  color: var(--Red);
+  cursor: pointer;
+}
+
+.increment:hover, 
+.decrement:hover {
+   cursor: pointer;
+   background-color: var(--Rose-100);
+}
+
+.increment:hover .pathFill, 
+.decrement:hover .pathFill {
+  fill: var(--Red);
+}
+
 .cart__icon {
   aspect-ratio: 1 / 1;
   width: 1.4rem;
 }
+
+      .addedToCart {
+        background-color: var(--Red);
+        border: solid var(--Red) 0.12rem;
+        color: var(--Rose-50);
+        font-weight: var(--Weight-400);
+        justify-content: space-around;
+        gap: 2rem;
+        height: 2.823125rem;
+      }
+
+      .addedToCart:hover {
+        color: var(--Rose-100);
+      }
+
+      .increment, .decrement {
+        border: solid var(--Rose-50) 1px;
+        height: 1rem;
+        width: 1rem;
+        border-radius: 50%;
+        padding: 2px;
+        display: none;
+      }
 
 .product-info__container {
   display: flex;
@@ -166,6 +207,7 @@ body {
 .order__details {
   display: flex;
   justify-content: space-between;
+  
   width: 100%;
 }
 
