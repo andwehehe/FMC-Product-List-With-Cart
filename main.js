@@ -51,16 +51,16 @@ fetch("assets/data/data.json")
       const addToCart = newProduct.querySelector(".addToCart");
       const increment = newProduct.querySelector(".increment");
       const decrement = newProduct.querySelector(".decrement");
+        
       let quantity = 0;
-     
+      let canClick = true;
       
       addToCart.addEventListener('click', () => {
-        let canClick = true;
         if(quantity < 1) {
-          canClick = true;
           quantity++;
           addItemsToCart();
         }
+
         if(!canClick) {
           return;
         }
@@ -71,59 +71,99 @@ fetch("assets/data/data.json")
         increment.style.display = "block";
         decrement.style.display = "block";
         canClick = false;
-        console.log("clicked");
       })
 
-
-        increment.addEventListener('click', (event) => {
-          event.stopPropagation();
+       
+        increment.addEventListener('click', () => {
           quantity++;
           btnText.textContent = quantity;
+
+          const orderDetails = document.querySelectorAll(".order__details");
+          orderDetails.forEach(order => {
+            const productName = order.querySelector(".product__ordered").textContent;
+            if(productName === name) {
+              const productQuantity = order.querySelector(".quantity");
+              const productTotalPrice = order.querySelector(".total__amount");
+
+              productQuantity.textContent = `${quantity}x`;
+              productTotalPrice.textContent = `$${(price * quantity).toFixed(2)}`;
+            }
+          })
         })
+
 
         decrement.addEventListener('click', (event) => {
           event.stopPropagation();
           quantity--;
           if(quantity < 1) {
-            cartIcon.style.display = "block";
-            btnText.textContent = "Add to Cart";
-            addToCart.classList.remove("addedToCart");
-            increment.style.display = "none";
-            decrement.style.display = "none";
-          } else {
-            btnText.textContent = quantity;
+            // cartIcon.style.display = "block";
+            // btnText.textContent = "Add to Cart";
+            // addToCart.classList.remove("addedToCart");
+            // increment.style.display = "none";
+            // decrement.style.display = "none";
+            return;
           }
+          btnText.textContent = quantity;
+          
+
+          const orderDetails = document.querySelectorAll(".order__details");
+          orderDetails.forEach(order => {
+            const productName = order.querySelector(".product__ordered").textContent;
+            if(productName === name) {
+              const productQuantity = order.querySelector(".quantity");
+              const productTotalPrice = order.querySelector(".total__amount");
+
+              productQuantity.textContent = `${quantity}x`;
+              productTotalPrice.textContent = `$${(price * quantity).toFixed(2)}`;
+            }
+          })
         })
 
       function addItemsToCart() {
-        const yourCart = document.querySelector(".your__cart");
-        const orderTotal = document.querySelector(".order__total");
+        const orderedSection = document.querySelector(".ordered__section");
 
         const orderDetails = document.createElement("div");
         orderDetails.classList.add("order__details");
         orderDetails.innerHTML = `
           <div class="checkout__details">
             <p class="product__ordered">${name}</p>
-            <span class="quantity">${quantity}x</span>
+            <span class="quantity">1x</span>
             <span class="actual__price">@ $${price.toFixed(2)}</span>
-            <span class="total__amount">$${(price * quantity).toFixed(2)}</span>
+            <span class="total__amount">$${price.toFixed(2)}</span>
           </div>
           <button class="cancel__btn" data-action="remove">
             <img src="assets/images/icon-remove-item.svg" alt="remove order" class="cancel__icon">
           </button>
         `;
         
-        yourCart.insertBefore(orderDetails, orderTotal);
+        orderedSection.appendChild(orderDetails);
         const newHr = document.createElement("hr");
         orderDetails.after(newHr);
+
+          const allOrder = document.querySelectorAll(".order__details");
+          allOrder.forEach(order => {
+
+            const cancelBtn = order.querySelector(".cancel__btn");
+            cancelBtn.addEventListener('click', () => {
+
+              const hrElement = order.querySelectorAll("hr");
+              const nextHr = order.nextElementSibling;
+              if (nextHr && nextHr.tagName === "HR") {
+                nextHr.remove();
+              }
+              order.remove();
+
+            })
+          })
+
+
       }
 
-
-      
     })
   })
+          
 
-
-
-
+          
+//   const orderQuantity = document.querySelectorAll(".quantity");
+//   orderQuantity[index].textContent = `${quantity}x`;
 
