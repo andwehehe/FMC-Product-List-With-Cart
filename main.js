@@ -1,3 +1,5 @@
+let listOfOrders = [];
+
 fetch("assets/data/data.json")
   .then(response => response.json())
   .then(products => {
@@ -65,12 +67,7 @@ fetch("assets/data/data.json")
           return;
         }
 
-        cartIcon.style.display = "none";
-        btnText.textContent = quantity;
-        addToCart.classList.add("addedToCart");
-        increment.style.display = "block";
-        decrement.style.display = "block";
-        canClick = false;
+        newCartButton();
       })
 
        
@@ -87,6 +84,8 @@ fetch("assets/data/data.json")
 
               productQuantity.textContent = `${quantity}x`;
               productTotalPrice.textContent = `$${(price * quantity).toFixed(2)}`;
+
+              changeTotal("+");
             }
           })
         })
@@ -94,15 +93,11 @@ fetch("assets/data/data.json")
 
         decrement.addEventListener('click', (event) => {
           event.stopPropagation();
-          quantity--;
-          if(quantity < 1) {
-            // cartIcon.style.display = "block";
-            // btnText.textContent = "Add to Cart";
-            // addToCart.classList.remove("addedToCart");
-            // increment.style.display = "none";
-            // decrement.style.display = "none";
+          
+          if(quantity <= 1) {
             return;
           }
+          quantity--;
           btnText.textContent = quantity;
           
 
@@ -115,6 +110,8 @@ fetch("assets/data/data.json")
 
               productQuantity.textContent = `${quantity}x`;
               productTotalPrice.textContent = `$${(price * quantity).toFixed(2)}`;
+
+              changeTotal("-");
             }
           })
         })
@@ -132,7 +129,9 @@ fetch("assets/data/data.json")
             <span class="total__amount">$${price.toFixed(2)}</span>
           </div>
           <button class="cancel__btn" data-action="remove">
-            <img src="assets/images/icon-remove-item.svg" alt="remove order" class="cancel__icon">
+            <svg class="cancel__icon xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 10 10">
+              <path class="removeBtnFill" fill="#CAAFA7" d="M8.375 9.375 5 6 1.625 9.375l-1-1L4 5 .625 1.625l1-1L5 4 8.375.625l1 1L6 5l3.375 3.375-1 1Z"/>
+            </svg>
           </button>
         `;
         
@@ -140,30 +139,162 @@ fetch("assets/data/data.json")
         const newHr = document.createElement("hr");
         orderDetails.after(newHr);
 
-          const allOrder = document.querySelectorAll(".order__details");
+        removeOrder();
+        changeTotal("+");
+
+      }
+
+      function removeOrder() {
+        const allOrder = document.querySelectorAll(".order__details");
+        allOrder.forEach(order => {
+          const cancelBtn = order.querySelector(".cancel__btn");
+          cancelBtn.addEventListener('click', () => {
+            const nextHr = order.nextElementSibling;
+            if (nextHr && nextHr.tagName === "HR") {
+              nextHr.remove();
+              decAllToTotal(order);
+              defaultCartButton();
+            }
+            order.remove();
+          })
+        })  
+      }
+
+      function changeTotal(option) {
+        const finalAmount = document.querySelector(".displayed__amount");
+        let totalAmount;
+        
+        if(option === "+") {
+          totalAmount = +finalAmount.textContent + price;
+          totalNumOfOrders(option);
+        } else if(option === "-") {
+          totalAmount = +finalAmount.textContent - price;
+          totalNumOfOrders(option);
+        }
+
+        finalAmount.textContent = `${totalAmount.toFixed(2)}`;
+      }
+
+      function decAllToTotal(order) {
+        const finalAmount = document.querySelector(".displayed__amount");
+        const totalProductAmount = order.querySelector(".total__amount");
+        let totalAmount = +finalAmount.textContent - +totalProductAmount.textContent.slice(1);
+        finalAmount.textContent = `${totalAmount.toFixed(2)}`;
+
+        const totalOrders = document.querySelector(".totalNumOfOrder");
+        totalOrders.textContent = +totalOrders.textContent - quantity;
+
+        if(+totalOrders.textContent < 1) {
+          toggleCartDisplay("without orders");
+        }
+      }
+
+      function defaultCartButton() {
+        cartIcon.style.display = "block";
+        btnText.textContent = "Add to Cart";
+        addToCart.classList.remove("addedToCart");
+        increment.style.display = "none";
+        decrement.style.display = "none";
+        canClick = true;
+        quantity = 0;
+      }
+
+      function newCartButton() {
+        cartIcon.style.display = "none";
+        btnText.textContent = quantity;
+        addToCart.classList.add("addedToCart");
+        increment.style.display = "block";
+        decrement.style.display = "block";
+        canClick = false;
+      }
+
+      function totalNumOfOrders(option) {
+        const totalOrders = document.querySelector(".totalNumOfOrder");
+        if(option === "+") {
+          totalOrders.textContent = +totalOrders.textContent + 1;
+        } else if(option === "-") {
+          totalOrders.textContent = +totalOrders.textContent - 1;
+        }
+
+        if(+totalOrders.textContent === 1) {
+          toggleCartDisplay("with orders");
+          confirmOrder();
+        }
+      }
+
+      function toggleCartDisplay(option) {
+        const orderTotal = document.querySelector(".order__total");
+        const remark = document.querySelector(".remark");
+        const confirm = document.querySelector(".confirm__btn");
+
+        const emptyCartImg = document.querySelector(".empty__cart-img");
+        const emptyCartPrompt = document.querySelector(".empty__cart-prompt");
+
+        if(option === "with orders") {
+          orderTotal.style.display = "flex";
+          remark.style.display = "flex";
+          confirm.style.display = "block";
+
+          emptyCartImg.style.display = "none";
+          emptyCartPrompt.style.display = "none";
+        } else if(option === "without orders") {
+          orderTotal.style.display = "none";
+          remark.style.display = "none";
+          confirm.style.display = "none";
+
+          emptyCartImg.style.display = "block";
+          emptyCartPrompt.style.display = "block";
+        }
+      }
+
+      // function confirmOrder() {
+        
+      // }
+
+      function confirmOrder() {
+        const body = document.querySelector("body");
+        const confirmBtn = document.querySelector(".confirm__btn");
+        const overlay = document.querySelector(".overlay");
+
+        confirmBtn.addEventListener('click', () => {
+          overlay.style.display = "flex";
+          body.style.overflow = "hidden"
+          console.log("clicked")
+          startNewOrder();
+        })
+      }
+
+      function startNewOrder() {
+        const body = document.querySelector("body");
+        const overlay = document.querySelector(".overlay");
+        const newOrder = document.querySelector(".start-new__btn");
+        const allOrder = document.querySelectorAll(".order__details");
+        const totalNumOfOrder = document.querySelector(".totalNumOfOrder");
+        
+
+        newOrder.addEventListener('click', () => {
+          overlay.style.display = "none";
+          body.style.overflow = ""
           allOrder.forEach(order => {
+            const quantity = order.querySelector(".quantity");
+            const totalPrice = order.querySelector(".total__amount");
+            const displayedAmount = document.querySelector(".displayed__amount");
 
-            const cancelBtn = order.querySelector(".cancel__btn");
-            cancelBtn.addEventListener('click', () => {
+            displayedAmount.textContent = +displayedAmount.textContent - +totalPrice.textContent.slice(1);
+            totalNumOfOrder.textContent = +totalNumOfOrder.textContent - +quantity.textContent.slice(0, quantity.textContent.length - 1);
 
-              const hrElement = order.querySelectorAll("hr");
-              const nextHr = order.nextElementSibling;
-              if (nextHr && nextHr.tagName === "HR") {
-                nextHr.remove();
-              }
-              order.remove();
-
-            })
+            const nextHr = order.nextElementSibling;
+            if (nextHr && nextHr.tagName === "HR") {
+              nextHr.remove();
+            }
+            
+            order.remove();
           })
 
-
+          toggleCartDisplay("without orders");
+        }) 
       }
 
     })
   })
-          
-
-          
-//   const orderQuantity = document.querySelectorAll(".quantity");
-//   orderQuantity[index].textContent = `${quantity}x`;
 
