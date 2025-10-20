@@ -1,4 +1,4 @@
-let listOfOrders = [];
+let productStates = [];
 
 fetch("assets/data/data.json")
   .then(response => response.json())
@@ -48,73 +48,79 @@ fetch("assets/data/data.json")
       changeSize();
       window.addEventListener('resize', changeSize);
 
-      const cartIcon = newProduct.querySelector(".cart__icon");
       const btnText = newProduct.querySelector(".btnText");
       const addToCart = newProduct.querySelector(".addToCart");
       const increment = newProduct.querySelector(".increment");
       const decrement = newProduct.querySelector(".decrement");
-        
-      let quantity = 0;
-      let canClick = true;
-      
+
+      productStates.push({
+        name,   //name: name, same lang
+        quantity: 0,
+        canClick: true,
+        button: addToCart
+      });
+
       addToCart.addEventListener('click', () => {
-        if(quantity < 1) {
-          quantity++;
+        const state = productStates[index];
+
+        if(state.quantity < 1) {
+          state.quantity++;
           addItemsToCart();
         }
 
-        if(!canClick) {
+        if(!state.canClick) {
           return;
         }
 
-        newCartButton();
+        state.canClick = false;
+        newCartButton(index);
       })
 
-       
-        increment.addEventListener('click', () => {
-          quantity++;
-          btnText.textContent = quantity;
+      increment.addEventListener('click', () => {
+        const state = productStates[index];
+        state.quantity++;
+        btnText.textContent = state.quantity;
 
-          const orderDetails = document.querySelectorAll(".order__details");
-          orderDetails.forEach(order => {
-            const productName = order.querySelector(".product__ordered").textContent;
-            if(productName === name) {
-              const productQuantity = order.querySelector(".quantity");
-              const productTotalPrice = order.querySelector(".total__amount");
+        const orderDetails = document.querySelectorAll(".order__details");
+        orderDetails.forEach(order => {
+          const productName = order.querySelector(".product__ordered").textContent;
+          if(productName === name) {
+            const productQuantity = order.querySelector(".quantity");
+            const productTotalPrice = order.querySelector(".total__amount");
 
-              productQuantity.textContent = `${quantity}x`;
-              productTotalPrice.textContent = `$${(price * quantity).toFixed(2)}`;
+            productQuantity.textContent = `${state.quantity}x`;
+            productTotalPrice.textContent = `$${(price * state.quantity).toFixed(2)}`;
 
-              changeTotal("+");
-            }
-          })
-        })
-
-
-        decrement.addEventListener('click', (event) => {
-          event.stopPropagation();
-          
-          if(quantity <= 1) {
-            return;
+            changeTotal("+");
           }
-          quantity--;
-          btnText.textContent = quantity;
-          
-
-          const orderDetails = document.querySelectorAll(".order__details");
-          orderDetails.forEach(order => {
-            const productName = order.querySelector(".product__ordered").textContent;
-            if(productName === name) {
-              const productQuantity = order.querySelector(".quantity");
-              const productTotalPrice = order.querySelector(".total__amount");
-
-              productQuantity.textContent = `${quantity}x`;
-              productTotalPrice.textContent = `$${(price * quantity).toFixed(2)}`;
-
-              changeTotal("-");
-            }
-          })
         })
+      })
+
+
+      decrement.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const state = productStates[index]; 
+          
+        if(state.quantity <= 1) {
+          return;
+        }
+        state.quantity--;
+        btnText.textContent = state.quantity;
+          
+        const orderDetails = document.querySelectorAll(".order__details");
+        orderDetails.forEach(order => {
+          const productName = order.querySelector(".product__ordered").textContent;
+          if(productName === name) {
+            const productQuantity = order.querySelector(".quantity");
+            const productTotalPrice = order.querySelector(".total__amount");
+
+            productQuantity.textContent = `${state.quantity}x`;
+            productTotalPrice.textContent = `$${(price * state.quantity).toFixed(2)}`;
+
+            changeTotal("-");
+          }
+        })
+      })
 
       function addItemsToCart() {
         const orderedSection = document.querySelector(".ordered__section");
@@ -141,7 +147,6 @@ fetch("assets/data/data.json")
 
         removeOrder();
         changeTotal("+");
-
       }
 
       function removeOrder() {
@@ -153,7 +158,7 @@ fetch("assets/data/data.json")
             if (nextHr && nextHr.tagName === "HR") {
               nextHr.remove();
               decAllToTotal(order);
-              defaultCartButton();
+              defaultCartButton(index); // 🟢 FIX: pass index
             }
             order.remove();
           })
@@ -182,30 +187,44 @@ fetch("assets/data/data.json")
         finalAmount.textContent = `${totalAmount.toFixed(2)}`;
 
         const totalOrders = document.querySelector(".totalNumOfOrder");
-        totalOrders.textContent = +totalOrders.textContent - quantity;
+        totalOrders.textContent = +totalOrders.textContent - productStates[index].quantity;
 
         if(+totalOrders.textContent < 1) {
           toggleCartDisplay("without orders");
         }
       }
 
-      function defaultCartButton() {
+      function defaultCartButton(index) {
+        const state = productStates[index];
+        const addToCart = state.button;
+        const cartIcon = addToCart.querySelector(".cart__icon");
+        const btnText = addToCart.querySelector(".btnText");
+        const increment = addToCart.querySelector(".increment");
+        const decrement = addToCart.querySelector(".decrement");
+
         cartIcon.style.display = "block";
         btnText.textContent = "Add to Cart";
         addToCart.classList.remove("addedToCart");
         increment.style.display = "none";
         decrement.style.display = "none";
-        canClick = true;
-        quantity = 0;
+        state.canClick = true;
+        state.quantity = 0;
       }
 
-      function newCartButton() {
+      function newCartButton(index) {
+        const state = productStates[index];
+        const addToCart = state.button;
+        const cartIcon = addToCart.querySelector(".cart__icon");
+        const btnText = addToCart.querySelector(".btnText");
+        const increment = addToCart.querySelector(".increment");
+        const decrement = addToCart.querySelector(".decrement");
+
         cartIcon.style.display = "none";
-        btnText.textContent = quantity;
+        btnText.textContent = state.quantity;
         addToCart.classList.add("addedToCart");
         increment.style.display = "block";
         decrement.style.display = "block";
-        canClick = false;
+        state.canClick = false;
       }
 
       function totalNumOfOrders(option) {
@@ -247,10 +266,6 @@ fetch("assets/data/data.json")
         }
       }
 
-      // function confirmOrder() {
-        
-      // }
-
       function confirmOrder() {
         const body = document.querySelector("body");
         const confirmBtn = document.querySelector(".confirm__btn");
@@ -259,7 +274,6 @@ fetch("assets/data/data.json")
         confirmBtn.addEventListener('click', () => {
           overlay.style.display = "flex";
           body.style.overflow = "hidden"
-          console.log("clicked")
           startNewOrder();
         })
       }
@@ -271,10 +285,10 @@ fetch("assets/data/data.json")
         const allOrder = document.querySelectorAll(".order__details");
         const totalNumOfOrder = document.querySelector(".totalNumOfOrder");
         
-
         newOrder.addEventListener('click', () => {
           overlay.style.display = "none";
           body.style.overflow = ""
+
           allOrder.forEach(order => {
             const quantity = order.querySelector(".quantity");
             const totalPrice = order.querySelector(".total__amount");
@@ -282,19 +296,30 @@ fetch("assets/data/data.json")
 
             displayedAmount.textContent = +displayedAmount.textContent - +totalPrice.textContent.slice(1);
             totalNumOfOrder.textContent = +totalNumOfOrder.textContent - +quantity.textContent.slice(0, quantity.textContent.length - 1);
+            quantity.textContent = 0;
 
             const nextHr = order.nextElementSibling;
             if (nextHr && nextHr.tagName === "HR") {
               nextHr.remove();
             }
-            
             order.remove();
           })
-
+          resetAllCartBtn(); 
           toggleCartDisplay("without orders");
         }) 
       }
 
+      function resetAllCartBtn() {
+        const displayedAmount = document.querySelector(".displayed__amount");
+        displayedAmount.textContent = "0.00"; 
+
+        const totalNumOfOrder = document.querySelector(".totalNumOfOrder");
+        totalNumOfOrder.textContent = "0";
+
+        productStates.forEach((state, index) => {
+          defaultCartButton(index);
+        });
+      }
+
     })
   })
-
