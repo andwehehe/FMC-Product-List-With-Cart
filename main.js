@@ -57,7 +57,8 @@ fetch("assets/data/data.json")
         name,   //name: name, same lang
         quantity: 0,
         canClick: true,
-        button: addToCart
+        button: addToCart,
+        thumbnail
       });
 
       addToCart.addEventListener('click', () => {
@@ -95,7 +96,6 @@ fetch("assets/data/data.json")
           }
         })
       })
-
 
       decrement.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -158,7 +158,7 @@ fetch("assets/data/data.json")
             if (nextHr && nextHr.tagName === "HR") {
               nextHr.remove();
               decAllToTotal(order);
-              defaultCartButton(index); // 🟢 FIX: pass index
+              defaultCartButton(index); 
             }
             order.remove();
           })
@@ -273,7 +273,50 @@ fetch("assets/data/data.json")
 
         confirmBtn.addEventListener('click', () => {
           overlay.style.display = "flex";
-          body.style.overflow = "hidden"
+          body.style.overflow = "hidden";
+
+          const orderedSection = document.querySelector(".ordered__section");
+          const checkoutDetails = orderedSection.querySelectorAll(".checkout__details");
+          const checkoutProductDetails = document.querySelector(".checkout__product-details");
+          let displayedAmount = document.querySelector(".displayed__amount");
+          let displayedAmountCheck = document.querySelector(".displayed__amount-check");
+
+          checkoutProductDetails.innerHTML = "";
+          checkoutDetails.forEach(checkout => {
+            const productName = checkout.querySelector(".product__ordered").textContent;
+            const productQuantity = checkout.querySelector(".quantity").textContent;
+            const totalAmount = checkout.querySelector(".total__amount").textContent;
+            const actualPrice = checkout.querySelector(".actual__price").textContent;
+            
+            let productThumbnail;
+
+            productStates.forEach(products => {
+              if(productName === products.name) {
+                productThumbnail = products.thumbnail;
+              }
+            })
+
+            const newDetails = document.createElement("article");
+            newDetails.classList.add("order__details-check");
+            newDetails.innerHTML = `
+              <div class="with__thumbnail">
+                <img src="${productThumbnail}" alt="${productName}" class="thumbnail">
+                <div class="checkout__details-check">
+                  <p class="product__ordered-check">${productName}</p>
+                  <span class="quantity-check">${productQuantity}</span>
+                  <span class="actual__price-check">@ ${actualPrice}</span>
+                </div>
+              </div>
+              <span class="total__amount-check">${totalAmount}</span>
+            `
+            checkoutProductDetails.appendChild(newDetails);
+
+            const newHr = document.createElement("hr");
+            newHr.classList.add("checkout__hr")
+            newDetails.after(newHr);
+
+            displayedAmountCheck.textContent = displayedAmount.textContent;
+          })
           startNewOrder();
         })
       }
@@ -306,6 +349,7 @@ fetch("assets/data/data.json")
           })
           resetAllCartBtn(); 
           toggleCartDisplay("without orders");
+
         }) 
       }
 
